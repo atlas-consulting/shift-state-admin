@@ -7,6 +7,10 @@
   },
   "name": "admin",
   "version": "0.1.0",
+  "engines": {
+    "node": "12.x",
+    "yarn": "1.x"
+  },
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -24,6 +28,7 @@
   },
   "scripts": {
     "start": "node server/dist",
+    "heroku-prebuild": "make fresh-deps",
     "prestart": "run-s build:client build:server",
     "build": "run-p build:client build:server",
     "build:client": "react-scripts build",
