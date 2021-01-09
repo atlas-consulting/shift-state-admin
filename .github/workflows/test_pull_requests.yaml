@@ -12,4 +12,4 @@ jobs:
       - name: Install Deps
         run: yarn
       - name: Run Tests
-        run: yarn test:nowatch
+        run: yarn test
