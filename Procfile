@@ -1,1 +1,1 @@
-web: make from-scratch && make shift-state-run
+web: `make from-scratch && make shift-state-run`
