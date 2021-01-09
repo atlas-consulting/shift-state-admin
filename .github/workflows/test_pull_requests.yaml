@@ -10,6 +10,6 @@ jobs:
         with:
             node-version: '12'
       - name: Install Deps
-        run: yarn
+        run: make fresh-deps
       - name: Run Tests
-        run: yarn test:nowatch
+        run: make tests-run
