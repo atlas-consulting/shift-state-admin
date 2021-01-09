@@ -1,0 +1,17 @@
+on:
+  push:
+    branches: [main]
+jobs:
+  test_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+            node-version: '12'
+      - name: Install Deps
+        run: yarn
+      - name: Run Tests
+        run: yarn test:nowatch
