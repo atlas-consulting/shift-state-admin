@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch",
     "build": "tsc",
     "dev": "nodemon"
   },
