@@ -9,8 +9,7 @@ from-scratch:
 	yarn build
 
 fresh-deps:
-	yarn
-	cd server && yarn && cd ..
+	yarn && cd server && yarn && cd ..
 
 tests-run:
 	yarn test
