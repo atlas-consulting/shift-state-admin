@@ -8,7 +8,7 @@ function App() {
       <Router>
         <Switch>
           {false && <Redirect to="/sign-in" />}
-          {routes.map(({ name, path, component: Component, exact }) => <Route key={name} path={path} component={Component} exact={exact} />)}
+          {routes.map(({ name, path, component: Component, exact }, i) => <Route key={`${name}-${i}`} path={path} component={Component} exact={exact} />)}
         </Switch>
       </Router>
     </>
