@@ -2,18 +2,28 @@
  * @module server
  */
 import http from "http";
-import { Application } from "express";
-import { configuration, application } from "./core";
+import { IConfig, configManager, initialize } from "./core";
+import * as routers from "./routers";
 
-function startServer(app: Application, config: configuration.IConfig): void {
-  const server = http.createServer(app);
-  server.listen(config.PORT, () => {
-    config.LOGGER.log(
-      `Server running in mode: [${config.NODE_ENV}] on port: [${config.PORT}]`
+const CONFIG = configManager()
+  .addRouter(routers.authRouter.mount, routers.healthCheckRouter.mount)
+  .getConfig();
+
+function startServer(configuration: IConfig): void {
+  const APP = initialize(configuration);
+  const server = http.createServer(APP);
+  configuration.LOGGER.info("Firing Before Server Start Fns");
+  configuration.BEFORE_SERVER_START_FN.forEach(
+    async (fn) => await fn(configuration)
+  );
+  server.listen(configuration.PORT, () => {
+    configuration.LOGGER.info("Firing After Server Start Fns");
+    configuration.AFTER_SERVER_START_FN.forEach(
+      async (fn) => await fn(configuration)
     );
   });
 }
 
-startServer(application, configuration.DEFAULT_CONFIG);
+startServer(CONFIG);
 
 export default startServer;
