@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import passport from "passport";
 import { Request, Response, NextFunction } from "express";
+import config from "../../core/configuration";
+
+const CONFIG = config().getConfig();
 
 export async function handlePOSTSignUp(req: Request, res: Response) {
   res.status(201).json({
@@ -14,17 +17,22 @@ export function handlePOSTSignIn(
   res: Response,
   next: NextFunction
 ) {
-  return passport.authenticate("sign-in", async (error, account, info) => {
+  return passport.authenticate("sign-in", async (err, account, info) => {
     try {
-      if (error || !account) return next(error);
+      if (err || !account) {
+        return res.json(info.message);
+      }
       req.login(account, { session: false }, async (error) => {
-        if (error) return next(error);
+        if (error) {
+          console.log("Error(2):", error);
+          return next(error);
+        }
         const body = {
-          _id: account.id,
+          id: account.id,
           emailAddress: account.emailAddress,
         };
-        const token = jwt.sign({ account: body }, "TOP_SECRET");
-        res.json({ token });
+        const token = jwt.sign({ account: body }, CONFIG.APP_SECRET);
+        return res.json({ token });
       });
     } catch (err) {
       return next(err);
