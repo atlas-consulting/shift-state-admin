@@ -4,6 +4,7 @@ import morgan from "morgan";
 import compression from "compression";
 import { Application, RequestHandler, json, urlencoded } from "express";
 import * as connection from "./connection";
+import { getConnection } from "typeorm";
 interface ServerLifecycleFn {
   (config: IConfig): void | Promise<void | unknown>;
 }

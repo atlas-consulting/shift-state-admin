@@ -1,5 +1,6 @@
 /**
  * @module core
  */
-export { default as application } from "./application";
-export * as configuration from "./configuration";
+export { IConfig } from "./configuration";
+export { initialize } from "./application";
+export { default as configManager } from "./configuration";
