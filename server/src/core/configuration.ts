@@ -4,7 +4,7 @@ import morgan from "morgan";
 import compression from "compression";
 import { Application, RequestHandler, json, urlencoded } from "express";
 import * as connection from "./connection";
-import { getConnection } from "typeorm";
+
 interface ServerLifecycleFn {
   (config: IConfig): void | Promise<void | unknown>;
 }
@@ -20,9 +20,11 @@ export interface IConfig {
   MIDDLEWARE: RequestHandler[];
   BEFORE_SERVER_START_FN: ServerLifecycleFn[];
   AFTER_SERVER_START_FN: ServerLifecycleFn[];
+  APP_SECRET: string;
 }
 
 export const DEFAULT_CONFIG: IConfig = {
+  APP_SECRET: process.env.APP_SECRET || "SEKRET_KAT",
   NODE_ENV: (process.env.NODE_ENV as IConfig["NODE_ENV"]) || "development",
   PORT: ((process.env.PORT as unknown) as number) || 8080,
   LOGGER: console,
