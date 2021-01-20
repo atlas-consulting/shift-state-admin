@@ -1,10 +1,27 @@
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
+import config from "../../core/configuration";
 import { Account } from "../../entities/Account";
 
+const CONFIG = config().getConfig();
 const ACCOUNT_FIELDS_MAP = {
   usernameField: "emailAddress",
   passwordField: "password",
 };
+export const verifyToken = new JWTStrategy(
+  {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: CONFIG.APP_SECRET,
+  },
+  async (jwt, verfify) => {
+    try {
+      const account = await Account.find(jwt.id);
+      verfify(null, account);
+    } catch (error) {
+      verfify(error);
+    }
+  }
+);
 export const signUp = new LocalStrategy(
   ACCOUNT_FIELDS_MAP,
   async (emailAddress, password, done) => {

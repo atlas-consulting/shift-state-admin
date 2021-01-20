@@ -4,6 +4,9 @@ import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jsonwebtoken";
 import * as middleware from "./middleware";
 import { Account } from "../entities/Account";
+import config from "../core/configuration";
+
+const CONFIG = config().getConfig();
 
 passport.use(
   "sign-up",
@@ -55,10 +58,10 @@ function handlePOSTSignIn(req: Request, res: Response, next: NextFunction) {
       req.login(account, { session: false }, async (error) => {
         if (error) return next(error);
         const body = {
-          _id: account.id,
+          id: account.id,
           emailAddress: account.emailAddress,
         };
-        const token = jwt.sign({ account: body }, "TOP_SECRET");
+        const token = jwt.sign({ account: body }, CONFIG.APP_SECRET);
         res.json({ token });
       });
     } catch (err) {
