@@ -1,7 +1,7 @@
 import { Maybe } from 'true-myth'
 import { useSelector } from 'react-redux'
 import { Redirect } from 'react-router-dom';
-import { RootState } from '../state/rootReducer';
+import { RootState } from '../../state/rootReducer';
 
 export const asProtectedRoute = (Component: React.FC): React.FC => {
     return (props) => {

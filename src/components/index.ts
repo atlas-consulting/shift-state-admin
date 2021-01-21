@@ -1,3 +1,3 @@
-export { default as TopBar } from "./TopBar";
-export { default as SideNav } from "./SideNav";
-export { asProtectedRoute } from "./ProtectedRoute";
+export { default as TopBar } from "./ui/TopBar";
+export { default as SideNav } from "./ui/SideNav";
+export { asProtectedRoute } from "./utility/ProtectedRoute";
