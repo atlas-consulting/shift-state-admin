@@ -1,7 +1,8 @@
-import { AuthService } from "./auth/service";
+import fetch from "isomorphic-fetch";
+import { createAuthService } from "./auth/service";
 
 const ShiftState = {
-  auth: AuthService,
+  auth: createAuthService(fetch),
 };
 
 export default ShiftState;
