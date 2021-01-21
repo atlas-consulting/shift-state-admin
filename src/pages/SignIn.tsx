@@ -6,7 +6,7 @@ import { Label, FormGroup, Button, Input, FormFeedback } from 'reactstrap'
 import * as Layouts from './layouts'
 import shiftStateLogo from '../assets/images/shiftstate-logo.png'
 import { receiveToken } from '../state/modules/auth'
-import { AuthService } from '../services/auth'
+import ShiftState from '../state/modules/service'
 
 
 const signInSchema = Yup.object().shape({
@@ -26,7 +26,7 @@ const SignIn = () => {
                 onSubmit={async (credentials, { setSubmitting }) => {
                     setSubmitting(false)
                     try {
-                        const res = await AuthService.signIn(credentials)
+                        const res = await ShiftState.auth.signIn(credentials)
                         res.match({
                             Just: token => {
                                 dispatch(receiveToken(token))
@@ -55,7 +55,7 @@ const SignIn = () => {
                             <FormFeedback>{errors.password}</FormFeedback>
                         </FormGroup>
                         <FormGroup>
-                            <Button className="btn-block mb-3" type="submit">Sign In</Button>
+                            <Button className="btn-block mb-3" type="submit" disabled={isSubmitting}>Sign In</Button>
                         </FormGroup>
                         <FormGroup>
                             <Link className="d-block text-center" to="/sign-up">Sign Up</Link>
