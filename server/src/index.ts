@@ -6,7 +6,13 @@ import { IConfig, configManager, initialize } from "./core";
 import * as routers from "./routers";
 
 const CONFIG = configManager()
-  .addRouter(routers.authRouter.mount, routers.healthCheckRouter.mount)
+  .addRouter(
+    routers.authRouter.mount,
+    routers.healthCheckRouter.mount,
+    routers.emailClientRouter.mount,
+    routers.emailClientTypesRouter.mount,
+    routers.filtersRouter.mount
+  )
   .getConfig();
 
 function startServer(configuration: IConfig): void {

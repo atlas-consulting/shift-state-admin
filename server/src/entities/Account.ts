@@ -1,6 +1,13 @@
-import { PrimaryGeneratedColumn, Entity, BaseEntity, Column } from "typeorm";
-import { DEFAULT_CONFIG as config } from "../core/configuration";
+import {
+  PrimaryGeneratedColumn,
+  Entity,
+  BaseEntity,
+  Column,
+  OneToMany,
+} from "typeorm";
 import { encryptString, doesMatchHash } from "../utils";
+import { EmailClient } from "./EmailClient";
+import { Filter } from "./Filter";
 
 /* ---------------------------------- Types --------------------------------- */
 
@@ -21,6 +28,15 @@ export class Account extends BaseEntity {
   @Column({ name: "password" })
   password: string;
 
+  /* -------------------------------- Relations ------------------------------- */
+
+  @OneToMany((type) => EmailClient, (client) => client.accountId)
+  emailClients: EmailClient[];
+
+  @OneToMany(() => Filter, (filter) => filter.accountId)
+  filters: Filter[];
+
+  /* ------------------------------ Class Methods ----------------------------- */
   static async new(credentials: Credentials): Promise<Account> {
     const account = new Account();
     account.emailAddress = credentials.emailAddress;

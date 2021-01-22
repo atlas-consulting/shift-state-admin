@@ -4,6 +4,7 @@
 import path from "path";
 import express, { Application } from "express";
 import { IConfig } from "./configuration";
+import { handleResponse, StatusCode } from "./http";
 
 /* -------------------------------- Constants ------------------------------- */
 
@@ -22,6 +23,9 @@ export const initialize = (configuration: IConfig): Application => {
     routerFns(APP, configuration);
   });
   APP.use(express.static(BUILD_DIR));
+  APP.use("/api/*", (req, res) => {
+    handleResponse(res, StatusCode.NOT_FOUND);
+  });
   APP.use("*", (req, res) => {
     res.sendFile(path.join(BUILD_DIR, "index.html"));
   });
