@@ -1,8 +1,32 @@
 import { Request, Response, NextFunction } from "express";
 import { Maybe } from "true-myth";
-import { CREATE_EMAIL_CLIENT } from "./schema";
+import {
+  CREATE_EMAIL_CLIENT,
+  APPLY_FILTER_TO_CLIENT,
+  EMAIL_CLIENT_FILTERS,
+} from "./schema";
 import { http } from "../../core";
 import { EmailClientType } from "../../entities/EmailClientType";
+
+export const validateEmailClientFilters = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await EMAIL_CLIENT_FILTERS.validate(req.params);
+    next();
+  } catch (validationError) {
+    http.handleResponse(
+      res,
+      http.StatusCode.BAD_REQUEST,
+      null,
+      undefined,
+      validationError
+    );
+  }
+};
+
 export const validateCreateEmailClient = async (
   req: Request,
   res: Response,
@@ -26,6 +50,28 @@ export const validateCreateEmailClient = async (
         );
       },
     });
+  } catch (validationError) {
+    http.handleResponse(
+      res,
+      http.StatusCode.BAD_REQUEST,
+      null,
+      undefined,
+      validationError
+    );
+  }
+};
+
+export const validateApplyFilterToEmailClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await APPLY_FILTER_TO_CLIENT.validate({
+      ...req.params,
+      ...req.body,
+    });
+    next();
   } catch (validationError) {
     http.handleResponse(
       res,

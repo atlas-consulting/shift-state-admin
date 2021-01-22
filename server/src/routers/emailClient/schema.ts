@@ -7,3 +7,12 @@ export const CREATE_EMAIL_CLIENT = Yup.object({
   credentialToken: Yup.string().nullable(true).default(null),
   credentialSecret: Yup.string().nullable(true).default(null),
 });
+
+export const EMAIL_CLIENT_FILTERS = Yup.object({
+  emailClientId: Yup.number().required(),
+});
+
+export const APPLY_FILTER_TO_CLIENT = Yup.object({
+  filterId: Yup.number().required(),
+  emailClientId: Yup.number().required(),
+});
