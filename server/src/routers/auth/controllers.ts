@@ -49,7 +49,7 @@ export function onSignIn(config: IConfig) {
             return http.handleResponse(
               res,
               http.StatusCode.OK,
-              token,
+              { token },
               "Sign-In Successful"
             );
           });
