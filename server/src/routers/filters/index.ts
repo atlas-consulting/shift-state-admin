@@ -1,7 +1,7 @@
 import { Router, Application } from "express";
 import { FilterRoutes } from "./types";
 import { validateRequestFilters, validateCreateFilter } from "./middleware";
-import { Strategies } from "../auth";
+import { VERIFY_TOKEN } from "../auth/strategies";
 import { IConfig, http } from "../../core";
 import { Filter } from "../../entities/Filter";
 
@@ -11,7 +11,7 @@ export const mount = (application: Application, config: IConfig) => {
   filtersRouter
     .get(
       FilterRoutes.FILTERS_BY_ACCOUNT,
-      Strategies.VERIFY_TOKEN,
+      VERIFY_TOKEN,
       validateRequestFilters,
       async (req, res) => {
         config.LOGGER.info("Requesting all filters");
@@ -23,7 +23,7 @@ export const mount = (application: Application, config: IConfig) => {
     )
     .post(
       FilterRoutes.FILTERS,
-      Strategies.VERIFY_TOKEN,
+      VERIFY_TOKEN,
       validateCreateFilter,
       async (req, res) => {
         const newFilter = await Filter.create({ ...req.body } as Filter).save();

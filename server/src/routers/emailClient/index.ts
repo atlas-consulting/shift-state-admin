@@ -5,7 +5,7 @@ import {
   validateApplyFilterToEmailClient,
   validateEmailClientFilters,
 } from "./middleware";
-import { Strategies } from "../auth";
+import { VERIFY_TOKEN } from "../auth/strategies";
 import { EmailClient } from "../../entities/EmailClient";
 import { IConfig, http } from "../../core";
 import { EmailClientFilter } from "../../entities/EmailClientFilter";
@@ -16,25 +16,17 @@ export const mount = (application: Application, config: IConfig) => {
   config.LOGGER.info("Mounting EmailClient Router");
   const emailClientRouter = Router();
   emailClientRouter
-    .get(
-      EmailClientRoutes.EMAIL_CLIENT,
-      Strategies.VERIFY_TOKEN,
-      async (req, res) => {}
-    )
-    .get(
-      EmailClientRoutes.EMAIL_CLIENTS,
-      Strategies.VERIFY_TOKEN,
-      async (req, res) => {
-        config.LOGGER.info("Requesting all EmailClients");
-        const emailClients = await EmailClient.find({
-          relations: ["type"],
-        });
-        http.handleResponse(res, http.StatusCode.OK, emailClients);
-      }
-    )
+    .get(EmailClientRoutes.EMAIL_CLIENT, VERIFY_TOKEN, async (req, res) => {})
+    .get(EmailClientRoutes.EMAIL_CLIENTS, VERIFY_TOKEN, async (req, res) => {
+      config.LOGGER.info("Requesting all EmailClients");
+      const emailClients = await EmailClient.find({
+        relations: ["type"],
+      });
+      http.handleResponse(res, http.StatusCode.OK, emailClients);
+    })
     .post(
       EmailClientRoutes.EMAIL_CLIENTS,
-      Strategies.VERIFY_TOKEN,
+      VERIFY_TOKEN,
       validateCreateEmailClient,
       async (req, res) => {
         config.LOGGER.info("Creating new EmailClient");
@@ -46,7 +38,7 @@ export const mount = (application: Application, config: IConfig) => {
     )
     .get(
       EmailClientRoutes.EMAIL_CLIENT_FILTERS,
-      Strategies.VERIFY_TOKEN,
+      VERIFY_TOKEN,
       validateEmailClientFilters,
       async (req, res) => {
         const { emailClientId } = await EMAIL_CLIENT_FILTERS.validate({
@@ -71,7 +63,7 @@ export const mount = (application: Application, config: IConfig) => {
     )
     .post(
       EmailClientRoutes.EMAIL_CLIENT_FILTERS,
-      Strategies.VERIFY_TOKEN,
+      VERIFY_TOKEN,
       validateApplyFilterToEmailClient,
       async (req, res) => {
         await EmailClientFilter.create({
