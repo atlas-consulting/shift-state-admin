@@ -1,5 +1,7 @@
+import passport, { AuthenticateOptions } from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
+import { Strategy } from "./types";
 import config from "../../core/configuration";
 import { Account } from "../../entities/Account";
 
@@ -65,3 +67,19 @@ export const infoMessageToResponse = (
       return "Unauthorized";
   }
 };
+
+const AUTH_OPTIONS: AuthenticateOptions = { session: false };
+
+/* ----------------------------- Bind Strategies ---------------------------- */
+passport.use(Strategy.VERIFY_TOKEN, verifyToken);
+passport.use(Strategy.SIGN_UP, signUp);
+passport.use(Strategy.SIGN_IN, signIn);
+
+/* --------------------------- Exported Strategies -------------------------- */
+
+export const SIGN_UP = passport.authenticate(Strategy.SIGN_UP, AUTH_OPTIONS);
+export const SIGN_IN = passport.authenticate(Strategy.SIGN_IN, AUTH_OPTIONS);
+export const VERIFY_TOKEN = passport.authenticate(
+  Strategy.VERIFY_TOKEN,
+  AUTH_OPTIONS
+);
