@@ -30,6 +30,8 @@ export class EmailClient extends BaseEntity {
   @Column({ name: "credential_secret", nullable: true })
   credentialSecret: string;
 
+  /* -------------------------------- Relations ------------------------------- */
+
   @Column({ name: "account_id" })
   accountId: number;
   @ManyToOne(() => Account, (account) => account.emailClients)
@@ -42,5 +44,5 @@ export class EmailClient extends BaseEntity {
   type: EmailClientType;
 
   @OneToMany(() => EmailClientFilter, (emailFilter) => emailFilter.emailClient)
-  connectedFilters: Promise<EmailClientFilter[]>;
+  connectedFilters: EmailClientFilter[];
 }
