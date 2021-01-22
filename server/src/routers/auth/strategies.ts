@@ -39,15 +39,29 @@ export const signIn = new LocalStrategy(
     try {
       const account = await Account.findOne({ where: { emailAddress } });
       if (!account) {
-        return done(null, false, { message: "Account not found" });
+        return done(null, false, {
+          message: "ACCOUNT_NOT_FOUND",
+        });
       }
       const isValidPassword = await account.isValidPassword(password);
       if (!isValidPassword) {
-        return done(null, false, { message: "Invalid Credentials" });
+        return done(null, false, { message: "INVALID_CREDENTIALS" });
       }
-      return done(null, account, { message: "Logged in Sucessfully" });
+      return done(null, account, { message: "SUCCESS" });
     } catch (error) {
       return done(error);
     }
   }
 );
+
+export const infoMessageToResponse = (
+  message: "SUCCESS" | "INVALID_CREDENTIALS" | "ACCOUNT_NOT_FOUND"
+): string => {
+  switch (message) {
+    case "SUCCESS":
+      return "Sign-In Successful";
+    case "ACCOUNT_NOT_FOUND":
+    case "INVALID_CREDENTIALS":
+      return "Unauthorized";
+  }
+};

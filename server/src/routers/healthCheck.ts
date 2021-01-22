@@ -1,13 +1,13 @@
 import { Application, Router } from "express";
-
+import { http } from "../core";
 const healthCheckRouter = Router();
 
 healthCheckRouter
   .get("/api/health-check", (req, res) => {
-    res.sendStatus(200);
+    http.handleResponse(res, http.StatusCode.OK);
   })
   .get("/api/ping", (req, res) => {
-    res.json("pong");
+    http.handleResponse(res, http.StatusCode.OK, "pong");
   });
 
 export const mount = (application: Application) => {

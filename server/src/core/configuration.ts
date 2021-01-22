@@ -1,21 +1,23 @@
+import pino from "pino";
+import expressPinoLogger from "express-pino-logger";
 import cors from "cors";
 import helmet from "helmet";
-import morgan from "morgan";
 import compression from "compression";
 import { Application, RequestHandler, json, urlencoded } from "express";
-import * as connection from "./connection";
+import * as orm from "./orm";
 
+/* ---------------------------------- Types --------------------------------- */
 interface ServerLifecycleFn {
   (config: IConfig): void | Promise<void | unknown>;
 }
 
 interface RouterFn {
-  (application: Application): void;
+  (application: Application, configuration: IConfig): void;
 }
 export interface IConfig {
   NODE_ENV: "development" | "test" | "production";
   PORT: number;
-  LOGGER: Console;
+  LOGGER: pino.BaseLogger;
   ROUTER_FNS: RouterFn[];
   MIDDLEWARE: RequestHandler[];
   BEFORE_SERVER_START_FN: ServerLifecycleFn[];
@@ -23,11 +25,12 @@ export interface IConfig {
   APP_SECRET: string;
 }
 
+/* -------------------------------- Constants ------------------------------- */
 export const DEFAULT_CONFIG: IConfig = {
   APP_SECRET: process.env.APP_SECRET || "SEKRET_KAT",
   NODE_ENV: (process.env.NODE_ENV as IConfig["NODE_ENV"]) || "development",
   PORT: ((process.env.PORT as unknown) as number) || 8080,
-  LOGGER: console,
+  LOGGER: pino(),
   ROUTER_FNS: [],
   MIDDLEWARE: [
     cors({ origin: "*" }),
@@ -35,9 +38,9 @@ export const DEFAULT_CONFIG: IConfig = {
     compression(),
     json(),
     urlencoded({ extended: false }),
-    morgan("combined"),
+    expressPinoLogger({ prettyPrint: true }),
   ],
-  BEFORE_SERVER_START_FN: [connection.connect],
+  BEFORE_SERVER_START_FN: [orm.connect],
   AFTER_SERVER_START_FN: [
     ({ LOGGER, NODE_ENV, PORT }) =>
       LOGGER.info(`Server running in mode: [${NODE_ENV}] on port: [${PORT}]`),
