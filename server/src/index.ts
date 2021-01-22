@@ -10,7 +10,8 @@ const CONFIG = configManager()
     routers.authRouter.mount,
     routers.healthCheckRouter.mount,
     routers.emailClientRouter.mount,
-    routers.emailClientTypesRouter.mount
+    routers.emailClientTypesRouter.mount,
+    routers.filtersRouter.mount
   )
   .getConfig();
 
