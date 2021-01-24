@@ -1,11 +1,14 @@
+import path from "path";
 import pino from "pino";
 import expressPinoLogger from "express-pino-logger";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
+import { config } from "dotenv";
 import { Application, RequestHandler, json, urlencoded } from "express";
 import * as orm from "./orm";
 
+config({ path: path.resolve(__dirname, "../../../.env") });
 /* ---------------------------------- Types --------------------------------- */
 interface ServerLifecycleFn {
   (config: IConfig): void | Promise<void | unknown>;
@@ -19,6 +22,8 @@ export interface IConfig {
   PORT: number;
   LOGGER: pino.BaseLogger;
   ROUTER_FNS: RouterFn[];
+  CLIENT_ID: string;
+  CLIENT_SECRET: string;
   MIDDLEWARE: RequestHandler[];
   BEFORE_SERVER_START_FN: ServerLifecycleFn[];
   AFTER_SERVER_START_FN: ServerLifecycleFn[];
@@ -30,6 +35,8 @@ export const DEFAULT_CONFIG: IConfig = {
   APP_SECRET: process.env.APP_SECRET || "SEKRET_KAT",
   NODE_ENV: (process.env.NODE_ENV as IConfig["NODE_ENV"]) || "development",
   PORT: ((process.env.PORT as unknown) as number) || 8080,
+  CLIENT_ID: process.env.CLIENT_ID || "",
+  CLIENT_SECRET: process.env.CLIENT_SECRET || "",
   LOGGER: pino(),
   ROUTER_FNS: [],
   MIDDLEWARE: [
