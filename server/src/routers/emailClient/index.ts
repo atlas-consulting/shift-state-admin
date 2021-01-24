@@ -1,3 +1,4 @@
+import { Maybe } from "true-myth";
 import { Application, Router } from "express";
 import { EmailClientRoutes } from "./types";
 import {
@@ -10,12 +11,154 @@ import { EmailClient } from "../../entities/EmailClient";
 import { IConfig, http } from "../../core";
 import { EmailClientFilter } from "../../entities/EmailClientFilter";
 import { Equal } from "typeorm";
-import { EMAIL_CLIENT_FILTERS } from "./schema";
+import {
+  EMAIL_CLIENT_FILTERS,
+  EMAIL_CLIENT_STATE,
+  EMAIL_CLIENT_QUERY,
+} from "./schema";
+import {
+  ClientType,
+  getClientToken,
+  parseClientType,
+} from "../../services/clientAuthUrl";
+import { GMAIL_CLIENT_TOKEN, MS_CLIENT_TOKEN } from "../clientAuthUrls/schema";
 
 export const mount = (application: Application, config: IConfig) => {
   config.LOGGER.info("Mounting EmailClient Router");
   const emailClientRouter = Router();
   emailClientRouter
+    // ! Really needs a clean up
+    .get(EmailClientRoutes.EMAIL_CLIENT_CREDENTIALS, async (req, res) => {
+      config.LOGGER.info("Callback Url request", req.url);
+      config.LOGGER.info("Attempting to extract client access code");
+      config.LOGGER.info("------------------------------------------->");
+      try {
+        const { state, code } = await EMAIL_CLIENT_QUERY.validate(req.query);
+        config.LOGGER.info("Extracted client code");
+        config.LOGGER.info("Attempting to parse state data");
+        const data = JSON.parse(state);
+        config.LOGGER.info(data);
+        const {
+          emailClientId,
+          clientType: unsafeClientType,
+        } = await EMAIL_CLIENT_STATE.validate(data);
+        const clientType = parseClientType(unsafeClientType);
+        config.LOGGER.info("Requesting access token");
+        switch (clientType) {
+          case ClientType.OFFICE:
+            getClientToken(
+              clientType,
+              config.MS_CLIENT_ID,
+              config.MS_CLIENT_SECRET,
+              `http://${req.headers.host}${EmailClientRoutes.EMAIL_CLIENT_CREDENTIALS}`,
+              code,
+              (token) => {
+                token.match({
+                  Just: async (token) => {
+                    config.LOGGER.info(token as any);
+                    config.LOGGER.info(
+                      `Received token, applying to specified emailClient ${emailClientId}`
+                    );
+                    const emailClient = await EmailClient.findOne(
+                      {
+                        id: emailClientId,
+                      },
+                      { relations: ["type"] }
+                    );
+                    Maybe.fromNullable(emailClient).match({
+                      Just: async (emailClient) => {
+                        const { accessToken } = await MS_CLIENT_TOKEN.validate(
+                          token
+                        );
+                        emailClient.accessToken = accessToken;
+                        await emailClient.save();
+                        res.redirect("/");
+                      },
+                      Nothing: () => {
+                        http.handleResponse(
+                          res,
+                          http.StatusCode.NOT_FOUND,
+                          null,
+                          `Failed to locate Email Client ${emailClientId}`
+                        );
+                      },
+                    });
+                  },
+                  Nothing: () => {
+                    http.handleResponse(
+                      res,
+                      http.StatusCode.INTERNAL_SERVER_ERROR,
+                      null,
+                      "Failed to request token"
+                    );
+                  },
+                });
+              }
+            );
+            break;
+          case ClientType.GMAIL:
+            getClientToken(
+              clientType,
+              config.G_CLIENT_ID,
+              config.G_CLIENT_SECRET,
+              `http://${req.headers.host}${EmailClientRoutes.EMAIL_CLIENT_CREDENTIALS}`,
+              code,
+              (token) => {
+                token.match({
+                  Just: async (token) => {
+                    config.LOGGER.info(
+                      `Received token, applying to specified emailClient ${emailClientId}`
+                    );
+                    const emailClient = await EmailClient.findOne(
+                      {
+                        id: emailClientId,
+                      },
+                      { relations: ["type"] }
+                    );
+                    Maybe.fromNullable(emailClient).match({
+                      Just: async (emailClient) => {
+                        const {
+                          access_token,
+                          refresh_token,
+                        } = await GMAIL_CLIENT_TOKEN.validate(token);
+                        emailClient.accessToken = access_token;
+                        emailClient.refreshToken = refresh_token;
+                        await emailClient.save();
+                        res.redirect("/");
+                      },
+                      Nothing: () => {
+                        http.handleResponse(
+                          res,
+                          http.StatusCode.NOT_FOUND,
+                          null,
+                          `Failed to locate Email Client ${emailClientId}`
+                        );
+                      },
+                    });
+                  },
+                  Nothing: () => {
+                    http.handleResponse(
+                      res,
+                      http.StatusCode.INTERNAL_SERVER_ERROR,
+                      null,
+                      "Failed to request token"
+                    );
+                  },
+                });
+              }
+            );
+        }
+      } catch (error) {
+        http.handleResponse(
+          res,
+          http.StatusCode.INTERNAL_SERVER_ERROR,
+          null,
+          undefined,
+          error
+        );
+      }
+      config.LOGGER.info("------------------------------------------->");
+    })
     .get(EmailClientRoutes.EMAIL_CLIENT, VERIFY_TOKEN, async (req, res) => {})
     .get(EmailClientRoutes.EMAIL_CLIENTS, VERIFY_TOKEN, async (req, res) => {
       config.LOGGER.info("Requesting all EmailClients");

@@ -24,11 +24,11 @@ export class EmailClient extends BaseEntity {
   @Column({ unique: true })
   alias: string;
 
-  @Column({ name: "credential_token", nullable: true })
-  credentialToken: string;
+  @Column({ name: "access_token", nullable: true })
+  accessToken: string;
 
-  @Column({ name: "credential_secret", nullable: true })
-  credentialSecret: string;
+  @Column({ name: "refresh_token", nullable: true })
+  refreshToken: string;
 
   /* -------------------------------- Relations ------------------------------- */
 

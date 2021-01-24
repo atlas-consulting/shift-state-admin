@@ -16,3 +16,13 @@ export const APPLY_FILTER_TO_CLIENT = Yup.object({
   filterId: Yup.number().required(),
   emailClientId: Yup.number().required(),
 });
+
+export const EMAIL_CLIENT_QUERY = Yup.object({
+  code: Yup.string().required(),
+  state: Yup.string().required(),
+});
+
+export const EMAIL_CLIENT_STATE = Yup.object({
+  clientType: Yup.string().required(),
+  emailClientId: Yup.number().required(),
+});
