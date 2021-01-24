@@ -22,8 +22,10 @@ export interface IConfig {
   PORT: number;
   LOGGER: pino.BaseLogger;
   ROUTER_FNS: RouterFn[];
-  CLIENT_ID: string;
-  CLIENT_SECRET: string;
+  MS_CLIENT_ID: string;
+  MS_CLIENT_SECRET: string;
+  G_CLIENT_ID: string;
+  G_CLIENT_SECRET: string;
   MIDDLEWARE: RequestHandler[];
   BEFORE_SERVER_START_FN: ServerLifecycleFn[];
   AFTER_SERVER_START_FN: ServerLifecycleFn[];
@@ -35,8 +37,10 @@ export const DEFAULT_CONFIG: IConfig = {
   APP_SECRET: process.env.APP_SECRET || "SEKRET_KAT",
   NODE_ENV: (process.env.NODE_ENV as IConfig["NODE_ENV"]) || "development",
   PORT: ((process.env.PORT as unknown) as number) || 8080,
-  CLIENT_ID: process.env.CLIENT_ID || "",
-  CLIENT_SECRET: process.env.CLIENT_SECRET || "",
+  G_CLIENT_ID: process.env.G_CLIENT_ID || "",
+  G_CLIENT_SECRET: process.env.G_CLIENT_SECRET || "",
+  MS_CLIENT_ID: process.env.MS_CLIENT_ID || "",
+  MS_CLIENT_SECRET: process.env.MS_CLIENT_SECRET || "",
   LOGGER: pino(),
   ROUTER_FNS: [],
   MIDDLEWARE: [

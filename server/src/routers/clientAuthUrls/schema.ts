@@ -12,3 +12,8 @@ export const GMAIL_CLIENT_TOKEN = Yup.object({
   token_type: Yup.string().required(),
   expiry_date: Yup.number().required(),
 });
+
+export const MS_CLIENT_TOKEN = Yup.object({
+  accessToken: Yup.string().required(),
+  tokenType: Yup.string().required(),
+});

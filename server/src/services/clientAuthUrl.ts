@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 import { Maybe } from "true-myth";
 import { google } from "googleapis";
+import * as msal from "@azure/msal-node";
 
 const GMAIL = Yup.string().matches(new RegExp("[G|g]mail"));
 const OFFICE = Yup.string().matches(new RegExp("[O|o]ffice365"));
@@ -22,15 +23,27 @@ export const parseClientType = (type: string): ClientType => {
  * @param clientSecret
  * @param redirectUrl
  */
-export const getAuthUrl = (
+export const getAuthUrl = async (
   clientType: ClientType,
   clientId: string,
   clientSecret: string,
   redirectUrl: string,
   state: Record<string, unknown> = {}
-): string => {
+): Promise<string> => {
   switch (clientType) {
     case ClientType.OFFICE:
+      const msalConfig: msal.Configuration = {
+        auth: {
+          clientId,
+          clientSecret,
+        },
+      };
+      const msalClient = new msal.ConfidentialClientApplication(msalConfig);
+      return await msalClient.getAuthCodeUrl({
+        scopes: [],
+        redirectUri: redirectUrl,
+        state: JSON.stringify(state),
+      });
     case ClientType.GMAIL:
       const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUrl);
       return auth.generateAuthUrl({
@@ -61,6 +74,23 @@ export const getClientToken = (
 ): void => {
   switch (clientType) {
     case ClientType.OFFICE:
+      const msalConfig: msal.Configuration = {
+        auth: {
+          clientId,
+          clientSecret,
+        },
+      };
+      const msalClient = new msal.ConfidentialClientApplication(msalConfig);
+      msalClient
+        .acquireTokenByCode({
+          code,
+          scopes: [],
+          redirectUri: redirectUrl,
+        })
+        .then((res) => {
+          callback(Maybe.fromNullable(res));
+        });
+      break;
     case ClientType.GMAIL:
       const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUrl);
       // ! Happy path coding, may have to address later
