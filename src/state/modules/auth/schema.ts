@@ -6,3 +6,10 @@ export const signInResponse = Yup.object({
     token: Yup.string().required(),
   }),
 });
+
+export const ACCOUNT = Yup.object({
+  account: Yup.object({
+    id: Yup.number().required(),
+    emailAddress: Yup.string().required(),
+  }).required(),
+});

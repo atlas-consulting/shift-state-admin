@@ -16,7 +16,8 @@ export const mount = (application: Application, config: IConfig) => {
       async (req, res) => {
         config.LOGGER.info("Requesting all filters");
         const allFilters = await Filter.find({
-          where: { accountId: req.body.accountId },
+          where: { accountId: req.params.accountId },
+          relations: ["connectedEmailClients"],
         });
         http.handleResponse(res, http.StatusCode.OK, allFilters);
       }

@@ -7,5 +7,9 @@ export const selectEmailClients = ({
 export const selectEmailClientsList = (state: RootState) =>
   Object.values(selectEmailClients(state));
 
+export const selectEmailClientById = (emailClientId: number) => (
+  state: RootState
+) => selectEmailClients(state)[emailClientId];
+
 export const selectHasEmailClients = (state: RootState) =>
   !!selectEmailClientsList(state).length;

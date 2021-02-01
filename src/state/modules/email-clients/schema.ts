@@ -8,6 +8,7 @@ export const PERSISTED_EMAIL_CLIENT = Yup.object({
   type: Yup.object({
     description: Yup.string().required(),
   }),
+  connectedFilters: Yup.array().required(),
 });
 
 export const FETCH_EMAIL_CLIENTS_SUCCESS_RESPONSE = Yup.object({

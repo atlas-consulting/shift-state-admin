@@ -16,6 +16,7 @@ export class EmailClientFilter extends BaseEntity {
   filterId: number;
   @ManyToOne(() => EmailClient, (emailClient) => emailClient.connectedFilters, {
     primary: true,
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "email_client_id" })
   emailClient: EmailClient;
@@ -23,6 +24,7 @@ export class EmailClientFilter extends BaseEntity {
   @ManyToOne(() => Filter, (filter) => filter.connectedEmailClients, {
     primary: true,
     eager: true,
+    onDelete: "CASCADE",
   })
   @JoinColumn({ name: "filter_id" })
   filter: Filter;

@@ -21,7 +21,7 @@ export class EmailClient extends BaseEntity {
   })
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   alias: string;
 
   @Column({ name: "access_token", nullable: true })
@@ -39,7 +39,7 @@ export class EmailClient extends BaseEntity {
 
   @Column({ nullable: true, name: "email_client_type_id" })
   emailClientTypeId: number;
-  @OneToOne((type) => EmailClientType)
+  @ManyToOne((type) => EmailClientType, (emailClientType) => emailClientType.id)
   @JoinColumn({ name: "email_client_type_id" })
   type: EmailClientType;
 

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Jumbotron } from 'reactstrap'
 import { Maybe } from 'true-myth'
+import { EmailClientCard } from '../components'
 import { selectToken } from '../state/modules/auth'
 import { fetchEmailClients, selectEmailClientsList, selectHasEmailClients } from '../state/modules/email-clients'
 import * as Layouts from './layouts'
@@ -25,15 +26,11 @@ const Dashboard = () => {
         </Jumbotron>
         <section className="p-4">
             <header>
-                <h2>{hasClients ? `Viewing ${emailClientsList.length} Clients` : "No Email Clients configured"}</h2>
+                <h2>{hasClients ? `Viewing ${emailClientsList.length} Email Clients` : "No Email Clients configured"}</h2>
             </header>
             <main>
-                <Link className="btn btn-primary" to="new-client">Create New Client</Link>
-                <ul>{emailClientsList.map((client) => <li key={client.id}>
-                    <article>
-                        <h4>{client.alias}</h4>
-                    </article>
-                </li>)}</ul>
+                <Link className="btn btn-primary my-2" to="new-client">Create New Client</Link>
+                <EmailClientCard.List>{emailClientsList.map((client) => <EmailClientCard.Card key={client.id} emailClient={client} />)}</EmailClientCard.List>
             </main>
         </section>
     </Layouts.DashboardLayout>

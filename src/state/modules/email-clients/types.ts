@@ -1,4 +1,5 @@
 import { ThunkAction } from "redux-thunk";
+import { Filter } from "../filters/types";
 
 export enum EmailClientEndpoints {
   EMAIL_CLIENTS = "/api/email-clients",
@@ -12,6 +13,9 @@ export interface EmailClient {
   type: {
     description: string;
   };
+  connectedFilters: {
+    filter: Filter;
+  }[];
 }
 export interface EmailClientState {
   emailClients: Record<number, EmailClient>;

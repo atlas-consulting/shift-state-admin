@@ -20,8 +20,10 @@ import {
   ClientType,
   getClientToken,
   parseClientType,
+  applyFilter,
 } from "../../services/clientAuthUrl";
 import { GMAIL_CLIENT_TOKEN, MS_CLIENT_TOKEN } from "../clientAuthUrls/schema";
+import { Filter } from "../../entities/Filter";
 
 export const mount = (application: Application, config: IConfig) => {
   config.LOGGER.info("Mounting EmailClient Router");
@@ -159,13 +161,29 @@ export const mount = (application: Application, config: IConfig) => {
       }
       config.LOGGER.info("------------------------------------------->");
     })
-    .get(EmailClientRoutes.EMAIL_CLIENT, VERIFY_TOKEN, async (req, res) => {})
+    .get(EmailClientRoutes.EMAIL_CLIENT, VERIFY_TOKEN, async (req, res) => {
+      config.LOGGER.info("Requesting all EmailClients");
+      const emailClient = await EmailClient.findOne(req.params.emailClientId, {
+        relations: ["type", "connectedFilters"],
+      });
+      http.handleResponse(res, http.StatusCode.OK, emailClient);
+    })
     .get(EmailClientRoutes.EMAIL_CLIENTS, VERIFY_TOKEN, async (req, res) => {
       config.LOGGER.info("Requesting all EmailClients");
-      const emailClients = await EmailClient.find({
-        relations: ["type"],
-      });
-      http.handleResponse(res, http.StatusCode.OK, emailClients);
+      try {
+        const emailClients = await EmailClient.find({
+          relations: ["type", "connectedFilters"],
+        });
+        http.handleResponse(res, http.StatusCode.OK, emailClients);
+      } catch (err) {
+        http.handleResponse(
+          res,
+          http.StatusCode.INTERNAL_SERVER_ERROR,
+          null,
+          undefined,
+          err
+        );
+      }
     })
     .post(
       EmailClientRoutes.EMAIL_CLIENTS,
@@ -173,10 +191,23 @@ export const mount = (application: Application, config: IConfig) => {
       validateCreateEmailClient,
       async (req, res) => {
         config.LOGGER.info("Creating new EmailClient");
-        const newEmailClient = await EmailClient.create({
-          ...req.body,
-        } as EmailClient).save();
-        http.handleResponse(res, http.StatusCode.CREATED, newEmailClient);
+        config.LOGGER.info("------------------------>");
+        config.LOGGER.info(req.body);
+        config.LOGGER.info("------------------------>");
+        try {
+          const newEmailClient = await EmailClient.create({
+            ...req.body,
+          } as EmailClient).save();
+          http.handleResponse(res, http.StatusCode.CREATED, newEmailClient);
+        } catch (err) {
+          http.handleResponse(
+            res,
+            http.StatusCode.INTERNAL_SERVER_ERROR,
+            null,
+            undefined,
+            err
+          );
+        }
       }
     )
     .get(
@@ -209,12 +240,48 @@ export const mount = (application: Application, config: IConfig) => {
       VERIFY_TOKEN,
       validateApplyFilterToEmailClient,
       async (req, res) => {
-        await EmailClientFilter.create({
-          ...req.params,
-          ...req.body,
-        } as EmailClientFilter).save();
-        http.handleResponse(res, http.StatusCode.CREATED);
+        const emailClient = await EmailClient.findOne(
+          req.params.emailClientId,
+          { relations: ["type"] }
+        );
+        const filter = await Filter.findOne(req.body.filterId);
+        try {
+          await applyFilter(
+            filter!,
+            emailClient!,
+            emailClient!.type.description
+          );
+          await EmailClientFilter.create({
+            ...req.params,
+            ...req.body,
+          } as EmailClientFilter).save();
+          http.handleResponse(res, http.StatusCode.CREATED);
+        } catch (error) {
+          config.LOGGER.info(error);
+          http.handleResponse(
+            res,
+            http.StatusCode.INTERNAL_SERVER_ERROR,
+            null,
+            undefined,
+            error
+          );
+        }
       }
-    );
+    )
+    .delete(EmailClientRoutes.EMAIL_CLIENT, VERIFY_TOKEN, async (req, res) => {
+      try {
+        await EmailClient.delete({ id: parseInt(req.params.emailClientId) });
+        http.handleResponse(res, http.StatusCode.OK);
+      } catch (error) {
+        config.LOGGER.info(error);
+        http.handleResponse(
+          res,
+          http.StatusCode.INTERNAL_SERVER_ERROR,
+          null,
+          undefined,
+          error
+        );
+      }
+    });
   application.use(emailClientRouter);
 };

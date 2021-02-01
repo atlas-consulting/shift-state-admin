@@ -50,3 +50,8 @@ export type AuthAction = ReceiveTokenAction | RevokeTokenAction;
 export interface AuthState {
   token?: string;
 }
+
+export interface Account {
+  id: number;
+  emailAddress: string;
+}

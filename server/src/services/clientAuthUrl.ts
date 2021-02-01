@@ -2,6 +2,8 @@ import * as Yup from "yup";
 import { Maybe } from "true-myth";
 import { google } from "googleapis";
 import * as msal from "@azure/msal-node";
+import { Filter } from "../entities/Filter";
+import { EmailClient } from "../entities/EmailClient";
 
 const GMAIL = Yup.string().matches(new RegExp("[G|g]mail"));
 const OFFICE = Yup.string().matches(new RegExp("[O|o]ffice365"));
@@ -54,6 +56,43 @@ export const getAuthUrl = async (
           "https://www.googleapis.com/auth/gmail.settings.basic",
         ],
       });
+  }
+};
+
+interface AuthCredentials {
+  clientId: string;
+  clientSecret: string;
+  redirectUrl: string;
+}
+export const applyFilter = async (
+  { filterConfiguration }: Filter,
+  emailClient: EmailClient,
+  emailClientTypeDesc: string
+) => {
+  console.log(emailClient, emailClientTypeDesc);
+  switch (emailClientTypeDesc) {
+    case "GMAIL":
+      const gmail = google.gmail({ version: "v1" });
+      const filter = await gmail.users.settings.filters.create({
+        oauth_token: emailClient.accessToken,
+        userId: "me",
+        requestBody: {
+          criteria: {
+            to: filterConfiguration.to as string,
+            from: filterConfiguration.from as string,
+            subject: filterConfiguration.subject as string,
+          },
+          action: {
+            forward: filterConfiguration.foward as string,
+            addLabelIds: ["TRASH"],
+          },
+        },
+      });
+      console.log(filter);
+      break;
+    default:
+      console.log("NoOp");
+      return;
   }
 };
 

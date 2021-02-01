@@ -17,6 +17,8 @@ function App() {
             <Route path="/sign-in" component={Pages.SignIn} />
             <Route path="/sign-up" component={Pages.SignUp} />
             <Route path="/new-client" component={asProtectedRoute(Pages.CreateClient)} />
+            <Route path="/filters" component={asProtectedRoute(Pages.ViewFilters)} />
+            <Route path="/new-filter" component={asProtectedRoute(Pages.CreateFilter)} />
             <Route path="/client/:clientId" component={asProtectedRoute(Pages.ViewClient)} />
             <Route component={Pages.NotFound} />
           </Switch>

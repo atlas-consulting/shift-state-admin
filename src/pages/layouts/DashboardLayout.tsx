@@ -4,6 +4,7 @@ import { Link, useHistory } from 'react-router-dom'
 import { Button, Nav, NavItem } from 'reactstrap'
 import { revokeToken } from '../../state/modules/auth'
 import shiftStateLogo from '../../assets/images/shiftstate-logo.png'
+import { RiDashboardFill, RiFilter2Fill } from 'react-icons/ri'
 
 const DashboardLayout: React.FC = ({ children }) => {
     const history = useHistory()
@@ -16,7 +17,8 @@ const DashboardLayout: React.FC = ({ children }) => {
         <aside className="aside p-4 bg-primary d-none d-lg-block" role="navigation">
             <img src={shiftStateLogo} alt="" style={{ width: 100, display: 'block', marginBottom: '2.5em' }} />
             <Nav vertical>
-                <NavItem><Link className="text-light" to="/">Home</Link></NavItem>
+                <NavItem className="mb-4"><Link className="text-light d-flex align-items-center" to="/"><RiDashboardFill className="mr-4" /> Home</Link></NavItem>
+                <NavItem ><Link className="text-light d-flex align-items-center" to="/filters"><RiFilter2Fill className="mr-4" /> Filters</Link></NavItem>
             </Nav>
         </aside>
         <main className="content-wrapper">
