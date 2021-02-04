@@ -10,13 +10,11 @@ export const mount = (application: Application, config: IConfig) => {
   const filtersRouter = Router();
   filtersRouter
     .get(
-      FilterRoutes.FILTERS_BY_ACCOUNT,
+      FilterRoutes.FILTERS,
       VERIFY_TOKEN,
-      validateRequestFilters,
       async (req, res) => {
         config.LOGGER.info("Requesting all filters");
         const allFilters = await Filter.find({
-          where: { accountId: req.params.accountId },
           relations: ["connectedEmailClients"],
         });
         http.handleResponse(res, http.StatusCode.OK, allFilters);
@@ -30,6 +28,19 @@ export const mount = (application: Application, config: IConfig) => {
         const newFilter = await Filter.create({ ...req.body } as Filter).save();
         http.handleResponse(res, http.StatusCode.CREATED, newFilter);
       }
-    );
+    )
+    .get(
+      FilterRoutes.FILTERS_BY_ACCOUNT,
+      VERIFY_TOKEN,
+      validateRequestFilters,
+      async (req, res) => {
+        config.LOGGER.info(`Requesting all filters for client ${req.params.accountId}`);
+        const allFilters = await Filter.find({
+          where: { accountId: req.params.accountId },
+          relations: ["connectedEmailClients"],
+        });
+        http.handleResponse(res, http.StatusCode.OK, allFilters);
+      }
+    )
   application.use(filtersRouter);
 };
