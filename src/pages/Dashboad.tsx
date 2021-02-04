@@ -15,7 +15,7 @@ const Dashboard = () => {
     useEffect(() => {
         Maybe.fromNullable(token).match({
             Just: (token) => dispatch(fetchEmailClients(token)),
-            Nothing: () => console.log('damn')
+            Nothing: () => console.log('Failed to fetch, missing token')
         })
     }, [token, dispatch])
     return <Layouts.DashboardLayout header='Welcome'>
