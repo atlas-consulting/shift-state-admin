@@ -1,7 +1,7 @@
 import * as Layout from './layouts'
 import * as Yup from 'yup'
-import { FormGroup, Label, Input, Button, Jumbotron, Breadcrumb, BreadcrumbItem } from 'reactstrap'
-import { Link, useHistory } from 'react-router-dom'
+import { FormGroup, Label, Input, Button } from 'reactstrap'
+import { useHistory } from 'react-router-dom'
 import { Formik, Form } from 'formik'
 import { useSelector } from 'react-redux'
 import { selectToken } from '../state/modules/auth'
@@ -54,16 +54,7 @@ const NewFilter = () => {
     const token = useSelector(selectToken)
     const { id: accountId } = useSelector(selectAccountDetails)
     const history = useHistory()
-    return <Layout.DashboardLayout>
-        <Jumbotron>
-            <h1 className="display-1">Create a New Filter</h1>
-            <section>
-                <Breadcrumb>
-                    <BreadcrumbItem><Link to="/">Home</Link></BreadcrumbItem>
-                    <BreadcrumbItem>View All Filters</BreadcrumbItem>
-                </Breadcrumb>
-            </section>
-        </Jumbotron>
+    return <Layout.DashboardLayout isSubPage header='Create a New Filter' subPageDescr="Create a New Filter">
         <main className="p-4">
             <Formik validationSchema={FILTER_CONFIG} initialValues={initialFilterConfig} onSubmit={((item, { setSubmitting }) => {
                 setSubmitting(false)

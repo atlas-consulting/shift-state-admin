@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 import { RiCheckboxCircleLine, RiFilter3Fill } from 'react-icons/ri'
 import { EmailClient } from '../../state/modules/email-clients/types'
-import { useSelector } from 'react-redux';
-import { selectToken } from '../../state/modules/auth';
 import { useRef } from 'react';
+import { useShiftState } from '../../hooks';
 
 interface EmailClientProp {
     emailClient: EmailClient
@@ -42,20 +41,9 @@ const EmailClientType = styled.div`
     color: ${({ emailClient: { type: { description } } }: EmailClientProp) => description === 'GMAIL' ? '#e74c3c' : '#fefefe'};
 `;
 
-const deleteClient = (token: string, emailClient: EmailClient, ref: React.RefObject<HTMLElement>) => {
-    fetch(`/api/email-clients/${emailClient.id}`, {
-        method: 'delete',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    }).then(res => res.json()).then(() => {
-        ref.current?.remove()
-    }).catch(console.error)
-}
-
 export const EmailClientCard: FC<EmailClientProp> = ({ emailClient }) => {
     const cardEl = useRef<HTMLElement>(null)
-    const token = useSelector(selectToken)
+    const { client } = useShiftState()
     return <CardContainer ref={cardEl}>
         <RiCheckboxCircleLine style={{ top: 16, right: 16, position: 'absolute', color: emailClient.accessToken ? '#e74c3c' : 'white' }} />
         <header style={{ flex: 1, paddingTop: 16 }}>
@@ -66,7 +54,9 @@ export const EmailClientCard: FC<EmailClientProp> = ({ emailClient }) => {
             <RiFilter3Fill /> {emailClient.connectedFilters.length} Filter(s) Connected
     </section>
         <footer style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button color="primary" style={{ borderRadius: 24 }} size="lg" onClick={() => deleteClient(token!, emailClient, cardEl)}>Delete</Button><Link to={`/client/${emailClient.id}`}><Button style={{ borderRadius: 24 }} size="lg">Edit</Button></Link>
+            <Button color="primary" style={{ borderRadius: 24 }} size="lg" onClick={() => client.remove(emailClient.id).then(() => {
+                cardEl.current?.remove()
+            })}>Delete</Button><Link to={`/client/${emailClient.id}`}><Button style={{ borderRadius: 24 }} size="lg">Edit</Button></Link>
         </footer>
     </CardContainer>
 }

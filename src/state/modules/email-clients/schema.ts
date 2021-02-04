@@ -11,6 +11,11 @@ export const PERSISTED_EMAIL_CLIENT = Yup.object({
   connectedFilters: Yup.array().required(),
 });
 
+export const NEW_EMAIL_CLIENT = Yup.object({
+  alias: Yup.string().required(),
+  emailClientTypeId: Yup.number().required()
+})
+
 export const FETCH_EMAIL_CLIENTS_SUCCESS_RESPONSE = Yup.object({
   data: Yup.array(PERSISTED_EMAIL_CLIENT).required(),
 });

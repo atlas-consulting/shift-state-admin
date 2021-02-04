@@ -1,5 +1,7 @@
 import { ThunkAction } from "redux-thunk";
+import { Asserts } from "yup";
 import { Filter } from "../filters/types";
+import { NEW_EMAIL_CLIENT } from "./schema";
 
 export enum EmailClientEndpoints {
   EMAIL_CLIENTS = "/api/email-clients",
@@ -39,6 +41,8 @@ export interface ReceiveEmailClientsAction {
   type: EmailClientActionTypes.RECEIVE_EMAIL_CLIENTS;
   payload: EmailClient[];
 }
+
+export interface NewEmailClient extends Asserts<typeof NEW_EMAIL_CLIENT> { }
 
 export type EmailClientActions =
   | FetchEmailClientsAction

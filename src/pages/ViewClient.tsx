@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
-import { Jumbotron, Spinner, Breadcrumb, BreadcrumbItem, Badge, Table } from 'reactstrap'
+import { useParams, } from 'react-router-dom'
+import { Spinner, Badge, Table } from 'reactstrap'
 import * as Layout from './layouts'
 import { AuthLink } from '../components'
 import { selectToken } from '../state/modules/auth'
@@ -14,7 +14,7 @@ const ViewClient = () => {
     const { clientId } = useParams<ViewClientParams>()
     const [emailClientDetails, setEmailClient] = useState<EmailClient | undefined>(undefined)
     const token = useSelector(selectToken)
-    const { alias, accessToken } = useSelector(selectEmailClientById(parseInt(clientId)))
+    const { accessToken } = useSelector(selectEmailClientById(parseInt(clientId)))
     const isVerified = !!accessToken
     useEffect(() => {
         fetch(`/api/email-clients/${clientId}`, {
@@ -23,16 +23,7 @@ const ViewClient = () => {
             }
         }).then(res => res.json()).then((response) => setEmailClient(response.data)).catch(console.error)
     }, [clientId, token])
-    return <Layout.DashboardLayout>
-        <Jumbotron>
-            <h1 className="display-1">View Client</h1>
-            <section>
-                <Breadcrumb>
-                    <BreadcrumbItem><Link to="/">Home</Link></BreadcrumbItem>
-                    <BreadcrumbItem>Client: {clientId} - {alias}</BreadcrumbItem>
-                </Breadcrumb>
-            </section>
-        </Jumbotron>
+    return <Layout.DashboardLayout header='View Client' isSubPage subPageDescr={`Viewing Client ${clientId}`}>
         {emailClientDetails ? <section style={{ padding: 20 }}>
             <div className="mb-4">{emailClientDetails.alias} - <Badge color="primary">{isVerified ? 'Verified' : 'Unverified'}</Badge></div>
             {isVerified ? '' : <AuthLink token={token!} emailClientId={emailClientDetails.id} clientType={emailClientDetails.type.description === "GMAIL" ? 'gmail' : 'office365'} />}
