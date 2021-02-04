@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 export const useCreateFilter = (initialClauses = {}) => {
     const [from, setFrom] = React.useState("");
@@ -20,7 +20,7 @@ export const useCreateFilter = (initialClauses = {}) => {
             [newClauseId]: { type: "AND", value: "", id: newClauseId }
         });
     };
-    const updateClause = (id: number) => (e: HTMLInputElement) => {
+    const updateClause = (id: number) => (e: ChangeEvent<HTMLInputElement>) => {
         setClause({
             ...clauses,
             [id]: {
@@ -33,9 +33,9 @@ export const useCreateFilter = (initialClauses = {}) => {
         const { [id]: _val, ...rest } = clauses;
         return setClause(rest);
     };
-    const updateFrom = (e: HTMLInputElement) => setFrom(e.target.value);
-    const updateForward = (e: HTMLInputElement) => setForward(e.target.value);
-    const updateSubject = (e: HTMLInputElement) => setSubject(e.target.value);
+    const updateFrom = (e: ChangeEvent<HTMLInputElement>) => setFrom(e.target.value);
+    const updateForward = (e: ChangeEvent<HTMLInputElement>) => setForward(e.target.value);
+    const updateSubject = (e: ChangeEvent<HTMLInputElement>) => setSubject(e.target.value);
     return {
         from,
         forward,
