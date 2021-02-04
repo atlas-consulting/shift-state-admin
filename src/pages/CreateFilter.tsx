@@ -1,9 +1,9 @@
-import * as Layout from './layouts'
 import * as Yup from 'yup'
 import { FormGroup, Label, Input, Button } from 'reactstrap'
 import { useHistory } from 'react-router-dom'
 import { Formik, Form } from 'formik'
 import { useSelector } from 'react-redux'
+import * as Layout from './layouts'
 import { selectToken } from '../state/modules/auth'
 import { selectAccountDetails } from '../state/modules/auth/selectors'
 
@@ -87,7 +87,6 @@ const NewFilter = () => {
                 </Form>
             }}</Formik>
         </main>
-
     </Layout.DashboardLayout>
 }
 
