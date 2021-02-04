@@ -1,54 +1,25 @@
 import React from 'react'
-import * as Yup from 'yup'
-import { Link, useHistory } from 'react-router-dom'
 import { Formik, Form } from 'formik'
-import { Jumbotron, Breadcrumb, BreadcrumbItem, FormGroup, Label, Input, Button } from 'reactstrap'
+import { useHistory } from 'react-router-dom'
+import { FormGroup, Label, Input, Button } from 'reactstrap'
 import * as Layouts from './layouts'
-import { useSelector } from 'react-redux'
-import { selectAccountDetails, selectToken } from '../state/modules/auth/selectors'
-
-const NEW_EMAIL_CLIENT = Yup.object({
-    alias: Yup.string().required(),
-    emailClientTypeId: Yup.number().required()
-})
+import { useAuth, useShiftState } from '../hooks'
+import { schema as emailClients } from '../state/modules/email-clients'
 
 const newEmailClientInitialValues = {
     alias: '',
     emailClientTypeId: 1
 }
-
 const CreateClient = () => {
-    const token = useSelector(selectToken)
     const history = useHistory()
-    const { id: accountId } = useSelector(selectAccountDetails)
-    const submitNewClient = (emailClient: typeof newEmailClientInitialValues) => {
-        return fetch("/api/email-clients", {
-            method: 'POST',
-            body: JSON.stringify({
-                accountId,
-                ...emailClient
-            }),
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        }).then(res => res.json())
-    }
-    return <Layouts.DashboardLayout>
-        <Jumbotron>
-            <h1 className="display-1">Create a New Client</h1>
-            <section>
-                <Breadcrumb>
-                    <BreadcrumbItem><Link to="/">Home</Link></BreadcrumbItem>
-                    <BreadcrumbItem>New Client</BreadcrumbItem>
-                </Breadcrumb>
-            </section>
-        </Jumbotron>
+    const { account: { id: accountId } } = useAuth()
+    const shiftState = useShiftState()
+    return <Layouts.DashboardLayout header="Create a New Client" isSubPage subPageDescr="Create a New Client">
         <main className="p-4">
-            <Formik validationSchema={NEW_EMAIL_CLIENT} initialValues={newEmailClientInitialValues} onSubmit={(newClient, { setSubmitting }) => {
+            <Formik validationSchema={emailClients.NEW_EMAIL_CLIENT} initialValues={newEmailClientInitialValues} onSubmit={(newClient, { setSubmitting }) => {
                 setSubmitting(false)
-                submitNewClient(newClient).then(() => {
-                    history.push("/")
+                shiftState.client.create(newClient, accountId).then((response) => {
+                    history.push('/')
                 })
             }}>
                 {({ isValid, values: { emailClientTypeId, alias }, touched, handleChange }) =>

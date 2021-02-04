@@ -59,17 +59,11 @@ export const getAuthUrl = async (
   }
 };
 
-interface AuthCredentials {
-  clientId: string;
-  clientSecret: string;
-  redirectUrl: string;
-}
 export const applyFilter = async (
   { filterConfiguration }: Filter,
   emailClient: EmailClient,
   emailClientTypeDesc: string
 ) => {
-  console.log(emailClient, emailClientTypeDesc);
   switch (emailClientTypeDesc) {
     case "GMAIL":
       const gmail = google.gmail({ version: "v1" });

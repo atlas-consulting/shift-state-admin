@@ -1,6 +1,5 @@
-import * as Yup from 'yup'
 import { useEffect, useState } from 'react'
-import { Jumbotron, Breadcrumb, BreadcrumbItem, Spinner, Table, Form } from 'reactstrap'
+import { Spinner, Table } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import { DashboardLayout } from './layouts'
 import { useSelector } from 'react-redux'
@@ -20,16 +19,7 @@ const ViewFilters = () => {
             setFilters(response.data)
         ).catch(console.error)
     }, [token, setFilters, id])
-    return <DashboardLayout>
-        <Jumbotron>
-            <h1 className="display-1">View All Filters</h1>
-            <section>
-                <Breadcrumb>
-                    <BreadcrumbItem><Link to="/">Home</Link></BreadcrumbItem>
-                    <BreadcrumbItem>View All Filters</BreadcrumbItem>
-                </Breadcrumb>
-            </section>
-        </Jumbotron>
+    return <DashboardLayout header='View All Filters' isSubPage subPageDescr="Viewing All Filters">
         <main className="p-4">
             <Link className="btn btn-primary my-2" to="new-filter">Create New Filter</Link>
             {Boolean(filters) ? <Table dark>

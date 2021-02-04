@@ -1,5 +1,4 @@
 import jwtDecode from "jwt-decode";
-import { Maybe } from "true-myth";
 import { Account } from "./types";
 import { ACCOUNT } from "./schema";
 import { RootState } from "../../rootReducer";

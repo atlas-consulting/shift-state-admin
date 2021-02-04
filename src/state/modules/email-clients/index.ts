@@ -5,3 +5,4 @@ export {
   selectEmailClientsList,
   selectHasEmailClients,
 } from "./selectors";
+export * as schema from './schema'
