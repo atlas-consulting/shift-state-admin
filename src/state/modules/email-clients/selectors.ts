@@ -13,3 +13,6 @@ export const selectEmailClientById = (emailClientId: number) => (
 
 export const selectHasEmailClients = (state: RootState) =>
   !!selectEmailClientsList(state).length;
+
+export const selectEmailClientsConnectedFilters = (emailClientId: number) =>
+  (state: RootState) => selectEmailClientById(emailClientId)(state).connectedFilters.map(f => f.filter.id)

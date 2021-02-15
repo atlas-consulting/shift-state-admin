@@ -1,6 +1,15 @@
 import * as Yup from 'yup'
 import { PERSISTED_EMAIL_CLIENT } from '../email-clients/schema'
 
+export const FILTER_CONFIURATION = Yup.object({
+    from: Yup.string().required(),
+    subject: Yup.string().required(),
+    clauses: Yup.object().shape({
+        type: Yup.string().required(),
+        value: Yup.string().required()
+    }).required()
+})
+
 export const PERSISTED_FILTER_SCHEMA = Yup.object({
     id: Yup.number().required(),
     description: Yup.string().required(),

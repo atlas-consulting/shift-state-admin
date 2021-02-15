@@ -1,16 +1,30 @@
 import { Maybe } from 'true-myth'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Spinner, Table } from 'reactstrap'
+import { Button, Spinner, Table } from 'reactstrap'
 import { DashboardLayout } from './layouts'
 import { useAuth } from '../hooks'
 import { actions, selectors } from '../state/modules/filters'
+import { FilterDefinition, formatFilterConfiguration } from '../utilities'
 const ViewFilters = () => {
+    const els = useRef<Record<string, HTMLTableRowElement>>({})
     const { token } = useAuth()
     const dispatch = useDispatch()
     const filtersList = useSelector(selectors.selectFiltersList)
     const hasFilters = useSelector(selectors.selectHastFilters)
+    const handleDeleteFilter = (filterId: any) => {
+        fetch(`/api/filters/${filterId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token!}`
+            }
+        })
+            .then(() => {
+                els.current[`${filterId}`].remove()
+            })
+            .catch(console.error)
+    }
     useEffect(() => {
         Maybe.fromNullable(token).match({
             Just(token) {
@@ -30,8 +44,13 @@ const ViewFilters = () => {
                 </thead>
                 <tbody>
                     {filtersList.map((f, i) => {
-                        return <tr key={`filter-${f.id}`}>
-                            <th scope="row">{i + 1}</th><td>{f.id}</td><td>{f.description}</td><td>{JSON.stringify(f.filterConfiguration)}</td><td>{f.createdAt}</td>
+                        return <tr key={`filter-${f.id}`} ref={(ele) => els.current[`${f.id}`] = ele!}>
+                            <th scope="row">{i + 1}</th>
+                            <td>{f.id}</td>
+                            <td>{f.description}</td>
+                            <td>{formatFilterConfiguration(f.filterConfiguration as unknown as FilterDefinition)}</td>
+                            <td>{f.createdAt}</td>
+                            <td><Button onClick={() => handleDeleteFilter(f.id)}>Delete</Button></td>
                         </tr>
                     })}
                 </tbody>

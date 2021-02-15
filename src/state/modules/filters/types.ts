@@ -7,7 +7,7 @@ import { PERSISTED_FILTERS_SCHEMA, PERSISTED_FILTER_SCHEMA } from "./schema";
 export type Filter = Asserts<typeof PERSISTED_FILTER_SCHEMA>
 export type Filters = Asserts<typeof PERSISTED_FILTERS_SCHEMA>
 
-interface FilterClause {
+export interface FilterClause {
   type: 'AND' | 'OR';
   id: number;
   value: string
@@ -16,7 +16,7 @@ interface FilterClause {
 export interface NewFilter {
   description: string;
   filterConfiguration: {
-    clauses: Record<string, FilterClause>;
+    clauses: Record<number, FilterClause>;
     subjectContains: string;
     forwardingAddress: string
   }

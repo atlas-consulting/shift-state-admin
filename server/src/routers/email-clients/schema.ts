@@ -13,7 +13,7 @@ export const EMAIL_CLIENT_FILTERS = Yup.object({
 });
 
 export const APPLY_FILTER_TO_CLIENT = Yup.object({
-  filterId: Yup.number().required(),
+  filterIds: Yup.array(Yup.number()).required(),
   emailClientId: Yup.number().required(),
 });
 

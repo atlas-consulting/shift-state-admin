@@ -29,6 +29,14 @@ export const mount = (application: Application, config: IConfig) => {
         http.handleResponse(res, http.StatusCode.CREATED, newFilter);
       }
     )
+    .delete(
+      FilterRoutes.FILTER_BY_ID,
+      VERIFY_TOKEN,
+      async (req, res) => {
+        await Filter.delete(req.params.filterId)
+        http.handleResponse(res, http.StatusCode.OK);
+      }
+    )
     .get(
       FilterRoutes.FILTERS_BY_ACCOUNT,
       VERIFY_TOKEN,

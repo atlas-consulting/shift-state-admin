@@ -72,13 +72,13 @@ export function buildAuthModule(config: EmailProviderAuthConfig) {
 
 function buildMicrosoftAuthProvider(provider: EmailProvider.OFFICE, config: EmailProviderAuthConfig) {
     const { [provider]: { clientId, clientSecret } } = config
-    return new msal.ConfidentialClientApplication({
+    const auth = new msal.ConfidentialClientApplication({
         auth: {
             clientId,
             clientSecret
         }
     })
-
+    return auth
 }
 
 function buildGoogleAuthProvider(provider: EmailProvider.GMAIL, config: EmailProviderAuthConfig) {

@@ -1,32 +1,20 @@
-import * as Yup from 'yup'
-import { FormGroup, Label, Input, Button } from 'reactstrap'
 import { useHistory } from 'react-router-dom'
-import { Formik, Form } from 'formik'
-import { useSelector } from 'react-redux'
+import { ButtonGroup, Label, Input, Button, InputGroup, InputGroupAddon, InputGroupText, Col, Row, FormGroup } from 'reactstrap'
 import * as Layout from './layouts'
-import { selectToken } from '../state/modules/auth'
-import { selectAccountDetails } from '../state/modules/auth/selectors'
+import { FilterClause } from '../state/modules/filters/types'
+import { useCreateFilter } from '../hooks/useCreateFilter'
+import { useAuth } from '../hooks'
+import { formatFilterConfiguration } from '../utilities'
 
 
 interface FilterConfiguration {
     description: string;
     from: string;
-    to: string;
     subject: string;
     forward: string;
+    clauses: Record<number, FilterClause>
 }
 
-const initialFilterConfig = {
-    description: "", from: "", to: "", subject: "", forward: ""
-}
-
-const FILTER_CONFIG = Yup.object({
-    description: Yup.string().required(),
-    from: Yup.string().email().required(),
-    to: Yup.string().email().required(),
-    subject: Yup.string().required(),
-    forward: Yup.string().email().required()
-})
 
 const submitNewFilter = ({ description, ...rest }: FilterConfiguration, token: string, accountId: number, callback: CallableFunction) => {
     fetch('/api/filters', {
@@ -51,42 +39,102 @@ const submitNewFilter = ({ description, ...rest }: FilterConfiguration, token: s
 }
 
 const NewFilter = () => {
-    const token = useSelector(selectToken)
-    const { id: accountId } = useSelector(selectAccountDetails)
+    const {
+        from,
+        forward,
+        description,
+        updateDescription,
+        subject,
+        updateFrom,
+        updateSubject,
+        updateForward,
+        clauses,
+        updateClause,
+        addAndClause,
+        addOrClause,
+        removeClaus
+    } = useCreateFilter({});
+    const { token, account: { id: accountId } } = useAuth()
     const history = useHistory()
     return <Layout.DashboardLayout isSubPage header='Create a New Filter' subPageDescr="Create a New Filter">
-        <main className="p-4">
-            <Formik validationSchema={FILTER_CONFIG} initialValues={initialFilterConfig} onSubmit={((item, { setSubmitting }) => {
-                setSubmitting(false)
-                submitNewFilter(item, token!, accountId, () => {
-                    history.push("/filters")
+        <code style={{ padding: 20, display: "block" }}>
+            {formatFilterConfiguration(
+                {
+                    clauses,
+                    from,
+                    subject
+                })}
+        </code>
+        <Row className="p-4 bg-light mx-0">
+            <Col md="6">
+                <section style={{ margin: "10px 0" }}>
+                    <FormGroup>
+                        <Label>
+                            Description
+                        </Label>
+                        <Input
+                            placeholder="Something to remember me by"
+                            value={description}
+                            onChange={updateDescription}
+                        />
+                    </FormGroup>
+                    <InputGroup>
+                        <InputGroupAddon addonType="prepend">
+                            <InputGroupText>From</InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                            placeholder="someone@up2nogood.com"
+                            value={from}
+                            onChange={updateFrom}
+                        />
+                    </InputGroup>
+                    <InputGroup className="my-2">
+                        <InputGroupAddon addonType="prepend">
+                            <InputGroupText>Forward to</InputGroupText>
+                        </InputGroupAddon>
+                        <Input
+                            placeholder="admin@shiftstate.com"
+                            value={forward}
+                            onChange={updateForward}
+                        />
+                    </InputGroup>
+                </section>
+            </Col>
+            <Col md="6">
+                <section style={{ margin: "10px 0" }}>
+                    <Label>Subject Contains</Label>
+                    <Input
+                        placeholder="Subject Contains"
+                        value={subject}
+                        onChange={updateSubject}
+                    />
+                    <ButtonGroup className="py-2">
+                        <Button color="primary" onClick={addAndClause}>
+                            Add AND
+              </Button>
+                        <Button color="success" onClick={addOrClause}>
+                            Add OR
+              </Button>
+                    </ButtonGroup>
+                    {!!Object.values(clauses).length &&
+                        Object.values(clauses).map((c) => {
+                            return (
+                                <InputGroup className="my-2" key={c.id}>
+                                    <Input value={c.value} onChange={updateClause(c.id)} />
+                                    <Button color="warning" onClick={() => removeClaus(c.id)}>
+                                        Remove {c.type}
+                                    </Button>
+                                </InputGroup>
+                            );
+                        })}
+                </section>
+            </Col>
+            <Button className="btn-full" onClick={() => {
+                submitNewFilter({ description, from, subject, clauses, forward }, token!, accountId, () => {
+                    history.push("/")
                 })
-            })}>{({ handleChange, isValid }) => {
-                return <Form>
-                    <FormGroup>
-                        <Label for="description">Description</Label>
-                        <Input type="text" name="description" placeholder="Something to remember me by." onChange={handleChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="from">From</Label>
-                        <Input type="email" name="from" onChange={handleChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="to">To</Label>
-                        <Input type="email" name="to" onChange={handleChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="subject">Subject</Label>
-                        <Input type="text" name="subject" onChange={handleChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="forward">Forward</Label>
-                        <Input type="email" name="forward" onChange={handleChange} />
-                    </FormGroup>
-                    <Button type="submit" disabled={!isValid}>Submit</Button>
-                </Form>
-            }}</Formik>
-        </main>
+            }}>Submit</Button>
+        </Row>
     </Layout.DashboardLayout>
 }
 

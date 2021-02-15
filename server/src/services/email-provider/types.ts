@@ -46,9 +46,9 @@ export const FilterRequestType = typeof FILTER_REQUEST_TYPES
 export enum FilterRequest {
     APPLY_FILTER_REQUEST = 'APPLY_FILTER_REQUEST'
 }
-
 export interface ApplyFilterRequest<P> {
     provider: P,
+    description: Filter['description'],
     type: FilterRequest.APPLY_FILTER_REQUEST,
     filterConfiguration: Filter['filterConfiguration'],
     emailClient: EmailClient,

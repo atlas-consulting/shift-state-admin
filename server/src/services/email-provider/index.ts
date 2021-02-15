@@ -42,6 +42,8 @@ export const auth = buildAuthModule({
         clientId: Maybe.fromNullable(process.env.MS_CLIENT_ID).unwrapOr(''),
         clientSecret: Maybe.fromNullable(process.env.MS_CLIENT_SECRET).unwrapOr(''),
         redirectUrl: EmailClientRoutes.EMAIL_CLIENT_CREDENTIALS,
-        scopes: []
+        scopes: [
+            'MailboxSettings.ReadWrite'
+        ]
     }
 })

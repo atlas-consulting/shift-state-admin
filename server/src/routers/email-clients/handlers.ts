@@ -154,20 +154,23 @@ export function createPOSTEmailClientFilter(config: IConfig) {
             req.params.emailClientId,
             { relations: ["type"] }
         );
-        const filter = await Filter.findOne(req.body.filterId);
+        const filters = await Filter.findByIds(req.body.filterIds);
         try {
             const provider = await EmailProvider.parse(emailClient!.type.description)
-            EmailProvider.filters.execute({
-                provider,
-                emailClient: emailClient!,
-                filterConfiguration: filter!.filterConfiguration,
-                type: FilterRequest.APPLY_FILTER_REQUEST,
-                accessToken: emailClient!.accessToken
-            })
-            await EmailClientFilter.create({
-                ...req.params,
-                ...req.body,
-            } as EmailClientFilter).save();
+            await Promise.all(filters.map(async (filter) => {
+                await EmailProvider.filters.execute({
+                    provider,
+                    description: filter!.description,
+                    emailClient: emailClient!,
+                    filterConfiguration: filter!.filterConfiguration,
+                    type: FilterRequest.APPLY_FILTER_REQUEST,
+                    accessToken: emailClient!.accessToken
+                })
+                await EmailClientFilter.create({
+                    ...req.params,
+                    filterId: filter.id,
+                } as EmailClientFilter).save();
+            }))
             http.handleResponse(res, http.StatusCode.CREATED);
         } catch (error) {
             config.LOGGER.info(error);
