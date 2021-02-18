@@ -7,19 +7,21 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Maybe } from 'true-myth'
+import { Maybe } from "true-myth";
 import { Account } from "./Account";
 import { EmailClientFilter } from "./EmailClientFilter";
 import { EmailClientType } from "./EmailClientType";
 import { Filter } from "./Filter";
 import { EmailProviderTypes } from "../services/email-provider/types";
-import { GMAIL_CLIENT_TOKEN, MS_CLIENT_TOKEN } from "../routers/client-auth-urls/schema";
+import {
+  GMAIL_CLIENT_TOKEN,
+  MS_CLIENT_TOKEN,
+} from "../routers/client-auth-urls/schema";
 
 @Entity({
   name: "email_clients",
 })
 export class EmailClient extends BaseEntity {
-
   /* ------------------------------- Properties ------------------------------- */
   @PrimaryGeneratedColumn({
     name: "email_client_id",
@@ -28,6 +30,21 @@ export class EmailClient extends BaseEntity {
 
   @Column()
   alias: string;
+
+  @Column({ name: "client_id", nullable: true })
+  clientId: string;
+
+  @Column({ name: "customer_id", nullable: true })
+  customerId: string;
+
+  @Column({ name: "client_email", nullable: true })
+  clientEmail: string;
+
+  @Column({ name: "client_secret", nullable: true })
+  clientSecret: string;
+
+  @Column({ nullable: true })
+  domain: string;
 
   @Column({ name: "access_token", nullable: true })
   accessToken: string;
@@ -54,31 +71,36 @@ export class EmailClient extends BaseEntity {
   /* -------------------------------------------------------------------------- */
   /*                                   Methods                                  */
   /* -------------------------------------------------------------------------- */
-  associateFilter(filter: Filter) {
-
-  }
-  static async addToken<T>(emailClientId: number, providerType: EmailProviderTypes, token: T) {
+  associateFilter(filter: Filter) {}
+  static async addToken<T>(
+    emailClientId: number,
+    providerType: EmailProviderTypes,
+    token: T
+  ) {
     const emailClient = await EmailClient.findOne({
-      id: emailClientId
-    })
+      id: emailClientId,
+    });
     Maybe.fromNullable(emailClient).match({
       Just: async (emailClient) => {
         switch (providerType) {
-          case 'gmail':
-            const { access_token, refresh_token } = await GMAIL_CLIENT_TOKEN.validate(token)
-            emailClient.accessToken = access_token
-            emailClient.refreshToken = refresh_token
-            await emailClient.save()
-            break
-          case 'office365':
-            const { accessToken } = await MS_CLIENT_TOKEN.validate(token)
-            emailClient.accessToken = accessToken
-            await emailClient.save()
+          case "gmail":
+            const {
+              access_token,
+              refresh_token,
+            } = await GMAIL_CLIENT_TOKEN.validate(token);
+            emailClient.accessToken = access_token;
+            emailClient.refreshToken = refresh_token;
+            await emailClient.save();
+            break;
+          case "office365":
+            const { accessToken } = await MS_CLIENT_TOKEN.validate(token);
+            emailClient.accessToken = accessToken;
+            await emailClient.save();
         }
       },
       Nothing: () => {
-        throw Error(`EmailClient of id ${emailClientId} not found`)
-      }
-    })
+        throw Error(`EmailClient of id ${emailClientId} not found`);
+      },
+    });
   }
 }

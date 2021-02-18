@@ -31,7 +31,7 @@ const ViewClient = () => {
     return <Layout.DashboardLayout header='View Client' isSubPage subPageDescr={`Viewing Client ${clientId}`}>
         {emailClientDetails ? <section style={{ padding: 20 }}>
             <div className="mb-4">{emailClientDetails.alias} - <Badge color="primary">{isVerified ? 'Verified' : 'Unverified'}</Badge></div>
-            {isVerified ? <>
+            <>
                 <AdminTable data={filters.filter(f => !filterIds.includes(f.id))} filterProp='description' idProp='id' withSelected={(selected => {
                     fetch(`/api/email-clients/${clientId}/filters`, {
                         method: 'POST',
@@ -80,7 +80,7 @@ const ViewClient = () => {
                         </>
                     }}
                 </AdminTable>
-            </> : <AuthLink token={token!} emailClientId={emailClientDetails.id} clientType={emailClientDetails.type.description === "GMAIL" ? 'gmail' : 'office365'} />}
+            </>
             <hr />
             <h2 className="display-4 my-4">Connected Filters</h2>
             <Table dark draggable>

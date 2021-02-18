@@ -10,6 +10,10 @@ export enum EmailClientEndpoints {
 export interface EmailClient {
   id: number;
   alias: string;
+  clientId: string | null | undefined;
+  clientEmail: string | null | undefined;
+  clientSecret: string | null | undefined;
+  domain: string | null | undefined;
   accessToken: string | null | undefined;
   refreshToken: string | null | undefined;
   type: {
@@ -42,7 +46,7 @@ export interface ReceiveEmailClientsAction {
   payload: EmailClient[];
 }
 
-export interface NewEmailClient extends Asserts<typeof NEW_EMAIL_CLIENT> { }
+export interface NewEmailClient extends Asserts<typeof NEW_EMAIL_CLIENT> {}
 
 export type EmailClientActions =
   | FetchEmailClientsAction
